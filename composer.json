@@ -1,5 +1,5 @@
 {
-    "name": "Agentejo/MongoLite",
+    "name": "agentejo/mongo-lite",
     "type": "library",
     "description": "Schemaless database on top of SqLite",
     "keywords": ["no-sql", "database", "schemaless", "sqlite", "pdo"],
