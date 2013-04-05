@@ -1,0 +1,27 @@
+{
+    "name": "MongoLite",
+    "type": "library",
+    "description": "Schemaless database on top of SqLite",
+    "keywords": ["no-sql", "database", "schemaless", "sqlite", "pdo"],
+    "homepage": "https://github.com/aheinze/MongoLite",
+    "license": "MIT",
+
+    "authors": [
+        {
+            "name": "Artur Heinze",
+            "email": "artur@agentejo.com",
+            "homepage": "http://agentejo.com"
+        }
+    ],
+
+    "require": {
+        "php": ">=5.3.2"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "MongoLite": "src/"
+        }
+    },
+
+}
