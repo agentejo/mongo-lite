@@ -17,7 +17,7 @@ Schemaless database on top of SqLite
 
     if ($products->count()) {
         
-        foreach($products->order(["price"=>1])->limit(5) as $product) {
+        foreach($products->sort(["price"=>1])->limit(5) as $product) {
             var_dump($product);
         }
     }

@@ -40,7 +40,7 @@ class Cursor implements \Iterator{
     /**
      * @var null|array
      */
-    protected $order;
+    protected $sort;
 
     /**
      * Constructor
@@ -96,14 +96,14 @@ class Cursor implements \Iterator{
     }
 
     /**
-     * Set order
+     * Set sort
      * 
-     * @param  mixed $orders
+     * @param  mixed $sorts
      * @return object       Cursor
      */
-    public function order($orders) {
+    public function sort($sorts) {
         
-        $this->order = $orders;
+        $this->sort = $sorts;
 
         return $this;
     }
@@ -145,11 +145,11 @@ class Cursor implements \Iterator{
             $sql[] = 'WHERE document_criteria("'.$this->criteria.'", document)';
         }
 
-        if ($this->order) {
+        if ($this->sort) {
             
             $orders = array();
 
-            foreach ($this->order as $field => $direction) {
+            foreach ($this->sort as $field => $direction) {
                 $orders[] = 'document_key("'.$field.'", document) '.($direction==-1 ? "DESC":"ASC");
             }
 
