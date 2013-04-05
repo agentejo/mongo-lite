@@ -33,6 +33,11 @@ class Cursor implements \Iterator{
     protected $limit;
 
     /**
+     * @var null|integer
+     */
+    protected $skip;
+
+    /**
      * @var null|array
      */
     protected $order;
@@ -40,8 +45,8 @@ class Cursor implements \Iterator{
     /**
      * Constructor
      * 
-     * @param object $collection [description]
-     * @param mixed $criteria   [description]
+     * @param object $collection
+     * @param mixed $criteria  
      */
     public function __construct($collection, $criteria) {
         $this->collection = $collection;
@@ -80,7 +85,7 @@ class Cursor implements \Iterator{
     /**
      * Set limit
      * 
-     * @param  mixed $limit [description]
+     * @param  mixed $limit
      * @return object       Cursor
      */
     public function limit($limit) {
@@ -93,12 +98,25 @@ class Cursor implements \Iterator{
     /**
      * Set order
      * 
-     * @param  mixed $orders [description]
+     * @param  mixed $orders
      * @return object       Cursor
      */
     public function order($orders) {
         
         $this->order = $orders;
+
+        return $this;
+    }
+
+    /**
+     * Set skip
+     * 
+     * @param  mixed $skip
+     * @return object       Cursor
+     */
+    public function skip($skip) {
+        
+        $this->skip = $skip;
 
         return $this;
     }
@@ -140,6 +158,8 @@ class Cursor implements \Iterator{
 
         if ($this->limit) {
             $sql[] = 'LIMIT '.$this->limit;
+
+            if ($this->skip) { $sql[] = 'OFFSET '.$this->skip; }
         }
 
         $sql = implode(' ', $sql);
