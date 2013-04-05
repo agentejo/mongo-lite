@@ -55,10 +55,25 @@ class Cursor implements \Iterator{
      */
     public function count() {
         
-        if(!$this->criteria) {
+        if (!$this->criteria) {
             $c = $this->collection->count();
 
             return !is_null($this->limit) ? ($this->limit<$c ? $this->limit:$c) : $c;
+
+        } else {
+
+            $sql = array('SELECT COUNT(*) AS C FROM '.$this->collection->name);
+            
+            $sql[] = 'WHERE document_criteria("'.$this->criteria.'", document)';
+
+            if ($this->limit) {
+                $sql[] = 'LIMIT '.$this->limit;
+            }
+
+            $stmt = $this->collection->database->connection->query(implode(" ", $sql));
+            $res  = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            return intval(isset($res['C']) ? $res['C']:0);
         }
     }
 
