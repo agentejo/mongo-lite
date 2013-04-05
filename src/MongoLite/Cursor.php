@@ -165,7 +165,7 @@ class Cursor implements \Iterator{
 
     public function valid() {
         
-        if($this->position==false) {
+        if($this->position===false) {
             $this->data     = $this->getData();
             $this->position = 0;
         }
