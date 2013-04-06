@@ -3,6 +3,7 @@ MongoLite
 
 Schemaless database on top of SqLite
 
+
 ###Sample Usage
 
     $client     = new MongoLite\Client(PATH_TO_WRITABLE_FOLDER);
@@ -89,4 +90,22 @@ In general you can use a callback or simple array as criteria
     Cursor::sort(array)
     Cursor::toArray()
 
+##Installation
 
+To install and use MongoLite via the composer PHP package manager just take these steps:
+
+
+If you don’t already have one, create the file composer.json in the root of your new project that is going to use MongoLite.
+
+Add the following to the composer.json file..
+
+    {
+        "require": {
+            "agentejo/mongo-lite": "dev-master"
+        }
+    }
+
+Install composer (if it isn’t already installed):
+
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install
