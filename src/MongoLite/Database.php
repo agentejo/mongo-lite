@@ -10,7 +10,7 @@ class Database {
     /**
      * @var PDO object
      */
-    public    $connection;
+    public $connection;
 
     /**
      * @var array

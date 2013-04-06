@@ -50,3 +50,42 @@ In general you can use a callback or simple array as criteria
 ###Delete documents
     
     $collection->remove($criteria);
+
+##API
+
+**Client**
+
+    Client::listDBs()
+    Client::selectDB(databasename)
+    Client::selectCollection(databasename, collectionname)
+
+**Database**
+
+    Database::vacuum()
+    Database::drop()
+    Database::createCollection(collectionname)
+    Database::dropCollection(collectionname)
+    Database::getCollectionNames()
+    Database::listCollections()
+    Database::selectCollection(collectionname)
+
+**Collection**
+
+    Collection::drop()
+    Collection::insert(document)
+    Collection::save(document)
+    Collection::update(criteria, data)
+    Collection::remove(criteria)
+    Collection::count()
+    Collection::find(criteria)
+    Collection::findOne(criteria)
+
+**Cursor**
+
+    Cursor::count()
+    Cursor::limit(number)
+    Cursor::skip(number)
+    Cursor::sort(array)
+    Cursor::toArray()
+
+
