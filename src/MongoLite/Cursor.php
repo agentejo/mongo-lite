@@ -61,9 +61,8 @@ class Cursor implements \Iterator{
     public function count() {
         
         if (!$this->criteria) {
-            $c = $this->collection->count();
-
-            return !is_null($this->limit) ? ($this->limit<$c ? $this->limit:$c) : $c;
+            
+            $stmt = $this->database->connection->query("SELECT COUNT(*) AS C FROM ".$this->collection->name);
 
         } else {
 
@@ -75,11 +74,12 @@ class Cursor implements \Iterator{
                 $sql[] = 'LIMIT '.$this->limit;
             }
 
-            $stmt = $this->collection->database->connection->query(implode(" ", $sql));
-            $res  = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            return intval(isset($res['C']) ? $res['C']:0);
+            $stmt = $this->collection->database->connection->query(implode(" ", $sql));    
         }
+
+        $res  = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return intval(isset($res['C']) ? $res['C']:0);
     }
 
     /**

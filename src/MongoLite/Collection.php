@@ -121,15 +121,13 @@ class Collection {
 
     /**
      * Count documents in collections
-     * 
+     *
+     * @param  mixed $criteria
      * @return integer
      */
-    public function count() {
+    public function count($criteria = null) {
         
-        $stmt   = $this->database->connection->query("SELECT COUNT(*) AS C FROM ".$this->name);
-        $res = $stmt->fetch( \PDO::FETCH_ASSOC);
-
-        return intval(isset($res['C']) ? $res['C']:0);
+        return $this->find($criteria)->count();
     }
 
     /**
@@ -152,5 +150,25 @@ class Collection {
         $items = $this->find($criteria)->limit(1)->toArray();
 
         return isset($items[0]) ? $items[0]:null; 
+    }
+
+    /**
+     * Rename Collection
+     * 
+     * @param  string $newname [description]
+     * @return boolean
+     */
+    public function renameCollection($newname) {
+        
+        if (!in_array($newname, $this->getCollectionNames())) {
+
+            $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$newname}");
+
+            $this->name = $newname;
+
+            return true;
+        }
+
+        return false;
     }
 }

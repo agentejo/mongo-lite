@@ -72,6 +72,7 @@ In general you can use a callback or simple array as criteria
 **Collection**
 
     Collection::drop()
+    Collection::renameCollection(newname)
     Collection::insert(document)
     Collection::save(document)
     Collection::update(criteria, data)
