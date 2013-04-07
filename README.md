@@ -88,6 +88,7 @@ In general you can use a callback or simple array as criteria
     Cursor::limit(number)
     Cursor::skip(number)
     Cursor::sort(array)
+    Cursor::each($callable)
     Cursor::toArray()
 
 ##Installation

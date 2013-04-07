@@ -122,6 +122,21 @@ class Cursor implements \Iterator{
     }
 
     /**
+     * Loop through result set
+     * 
+     * @param  mixed $callable
+     * @return object
+     */
+    public function each($callable) {
+        
+        foreach ($this->rewind() as $document) {
+            $callable($document);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get documents matching criteria
      * 
      * @return array
