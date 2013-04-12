@@ -29,13 +29,13 @@ Schemaless database on top of SqLite
 
 In general you can use a callback or simple array as criteria
 
-    $collection->find(function($document) {
+    $collection->find(function($document) {   // recommended to query data
         return $document["price"] > 10;
     });
 
     or
 
-    $collection->find(["name"=>"Super cool Product"]); // just for very simple criteria array
+    $collection->find(["price"=>['$gt'=>10]]); // only very simple criteria is supported (can be slow)
 
     or just one
 

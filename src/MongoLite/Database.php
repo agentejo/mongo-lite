@@ -79,12 +79,27 @@ class Database {
             $fn = array();
 
             foreach ($criteria as $key => $value) {
-                $fn[] = "(\$document['{$key}']==".(is_string($value) ? "'{$value}'": $value).")";
+                
+                $d = '$document';
+
+                if(strpos($key, ".") !== false) {
+                    $keys = explode('.', $key);
+
+                    foreach ($keys as &$k) {
+                        $d .= '["'.$k.'"]';
+                    }
+
+                } else {
+                    $d .= '["'.$key.'"]';
+                }
+
+                $fn[] = is_array($value) ? "\\MongoLite\\UtilArrayQuery::check({$d}, ".var_export($value, true).")": "({$d}==".(is_string($value) ? "'{$value}'": $value).")";
             }
 
             $fn = trim(implode(" && ", $fn));
-
+            
             $this->document_criterias[$id] = create_function('$document','return '.$fn.';');
+
             return $id;
         }
 
@@ -194,5 +209,95 @@ class Database {
     public function __get($collection) {
         
         return $this->selectCollection($collection);
-    }    
+    }
+}
+
+
+class UtilArrayQuery {
+
+    public static function check($value, $condition) {
+        $keys  = array_keys($condition);
+        $func  = $keys[0];
+        
+        return self::evaluate($func, $value, $condition[$func]);
+    }
+
+    private function evaluate($func, $a, $b) {
+        
+        $r = false;
+
+        switch ($func) {
+            case '$eq' :
+                $r = $a == $b;
+                break;
+            case '$not' :
+                $r = $a != $b;
+                break;
+            case '$gte' :
+            case '$gt' :
+                if (is_numeric($a) && is_numeric($b)) {
+                    $r = $a > $b;
+                }
+                break;
+
+            case '$lte' :
+            case '$lt' :
+                if (is_numeric($a) && is_numeric($b)) {
+                    $r = $a < $b;
+                }
+                break;
+            case '$in' :
+                if (! is_array($b))
+                    throw new \InvalidArgumentException('Invalid argument for $in option must be array');
+                $r = in_array($a, $b);
+                break;
+
+            case '$has' :
+                if (is_array($b))
+                    throw new \InvalidArgumentException('Invalid argument for $has array not supported');
+                $a = @json_decode($a, true) ?  : array();
+                $r = in_array($b, $a);
+                break;
+
+            case '$all' :
+                $a = @json_decode($a, true) ?  : array();
+                if (! is_array($b))
+                    throw new \InvalidArgumentException('Invalid argument for $all option must be array');
+                $r = count(array_intersect_key($a, $b)) == count($b);
+                break;
+
+            case '$regex' :
+            case '$preg' :
+            case '$match' :
+
+                $r = (boolean) preg_match($b, $a, $match);
+                break;
+
+            case '$size' :
+                $a = @json_decode($a, true) ?  : array();
+                $r = (int) $b == count($a);
+                break;
+
+            case '$mod' :
+                if (! is_array($b))
+                    throw new \InvalidArgumentException('Invalid argument for $mod option must be array');
+                list($x, $y) = each($b);
+                $r = $a % $x == 0;
+                break;
+
+            case '$func' :
+            case '$fn' :
+            case '$f' :
+                if (! is_callable($b))
+                    throw new \InvalidArgumentException('Function should be callable');
+                $r = $b($a);
+                break;
+
+            default :
+                throw new ErrorException("Condition not valid ... Use \$fn for custom operations");
+                break;
+        }
+
+        return $r;
+    }
 }
