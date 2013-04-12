@@ -76,29 +76,7 @@ class Database {
 
         if (is_array($criteria)) {
             
-            $fn = array();
-
-            foreach ($criteria as $key => $value) {
-                
-                $d = '$document';
-
-                if(strpos($key, ".") !== false) {
-                    $keys = explode('.', $key);
-
-                    foreach ($keys as &$k) {
-                        $d .= '["'.$k.'"]';
-                    }
-
-                } else {
-                    $d .= '["'.$key.'"]';
-                }
-
-                $fn[] = is_array($value) ? "\\MongoLite\\UtilArrayQuery::check({$d}, ".var_export($value, true).")": "({$d}==".(is_string($value) ? "'{$value}'": $value).")";
-            }
-
-            $fn = trim(implode(" && ", $fn));
-            
-            $this->document_criterias[$id] = create_function('$document','return '.$fn.';');
+            $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
 
             return $id;
         }
@@ -214,6 +192,43 @@ class Database {
 
 
 class UtilArrayQuery {
+
+    public static function buildCondition($criteria, $concat = " && ") {
+
+        $fn = array();
+
+        foreach ($criteria as $key => $value) {
+            
+            switch($key) {
+
+                case '$and':
+                    $fn[] = '('.self::buildCondition($value, ' && ').')';
+                    break;
+                case '$or':
+                    $fn[] = '('.self::buildCondition($value, ' || ').')';
+                    break;
+                default:
+
+                    $d = '$document';
+
+                    if(strpos($key, ".") !== false) {
+                        $keys = explode('.', $key);
+
+                        foreach ($keys as &$k) {
+                            $d .= '["'.$k.'"]';
+                        }
+
+                    } else {
+                        $d .= '["'.$key.'"]';
+                    }
+
+                    $fn[] = is_array($value) ? "\\MongoLite\\UtilArrayQuery::check({$d}, ".var_export($value, true).")": "({$d}==".(is_string($value) ? "'{$value}'": $value).")";
+            }
+        }
+
+        return count($fn) ? trim(implode($concat, $fn)) : 'true';
+    }
+    
 
     public static function check($value, $condition) {
         $keys  = array_keys($condition);

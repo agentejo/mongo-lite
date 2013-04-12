@@ -62,7 +62,7 @@ class Cursor implements \Iterator{
         
         if (!$this->criteria) {
             
-            $stmt = $this->database->connection->query("SELECT COUNT(*) AS C FROM ".$this->collection->name);
+            $stmt = $this->collection->database->connection->query("SELECT COUNT(*) AS C FROM ".$this->collection->name);
 
         } else {
 
