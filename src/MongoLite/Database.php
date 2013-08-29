@@ -237,7 +237,7 @@ class UtilArrayQuery {
         return self::evaluate($func, $value, $condition[$func]);
     }
 
-    private function evaluate($func, $a, $b) {
+    private static function evaluate($func, $a, $b) {
         
         $r = false;
 
