@@ -56,6 +56,9 @@ class Database {
 
             return $database->callCriteriaFunction($funcid, $document);
         }, 2);
+        
+        $this->connection->exec('PRAGMA journal_mode = MEMORY');
+        $this->connection->exec('PRAGMA synchronous = OFF');
 
     }
 
