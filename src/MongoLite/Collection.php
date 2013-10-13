@@ -44,7 +44,7 @@ class Collection {
     public function insert(&$document) {
         
         $table           = $this->name;
-        $document["_id"] = uniqid($table);
+        $document["_id"] = uniqid().'doc'.rand();
         $data            = array("document" => json_encode($document, JSON_NUMERIC_CHECK));
 
         $fields = array();
