@@ -30,12 +30,12 @@ class Database {
 
     /**
      * Constructor
-     * 
-     * @param string $path   
+     *
+     * @param string $path
      * @param array  $options
      */
     public function __construct($path = ":memory:", $options = array()) {
-        
+
         $dns = "sqlite:{$path}";
 
         $this->path = $path;
@@ -44,14 +44,14 @@ class Database {
         $database = $this;
 
         $this->connection->sqliteCreateFunction('document_key', function($key, $document){
-            
+
             $document = json_decode($document, true);
 
             return isset($document[$key]) ? $document[$key] : '';
         }, 2);
 
         $this->connection->sqliteCreateFunction('document_criteria', function($funcid, $document) use($database) {
-            
+
             $document = json_decode($document, true);
 
             return $database->callCriteriaFunction($funcid, $document);
@@ -64,9 +64,9 @@ class Database {
 
     /**
      * Register Criteria function
-     * 
+     *
      * @param  mixed $criteria
-     * @return mixed          
+     * @return mixed
      */
     public function registerCriteriaFunction($criteria) {
 
@@ -78,7 +78,7 @@ class Database {
         }
 
         if (is_array($criteria)) {
-            
+
             $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
 
             return $id;
@@ -89,8 +89,8 @@ class Database {
 
     /**
      * Execute registred criteria function
-     * 
-     * @param  string $id      
+     *
+     * @param  string $id
      * @param  array $document
      * @return boolean
      */
@@ -117,7 +117,7 @@ class Database {
 
     /**
      * Create a collection
-     * 
+     *
      * @param  string $name
      */
     public function createCollection($name) {
@@ -126,7 +126,7 @@ class Database {
 
     /**
      * Drop a collection
-     * 
+     *
      * @param  string $name
      */
     public function dropCollection($name) {
@@ -135,11 +135,11 @@ class Database {
 
     /**
      * Get all collection names in the database
-     * 
+     *
      * @return array
      */
     public function getCollectionNames() {
-        
+
         $stmt   = $this->connection->query("SELECT name FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence';");
         $tables = $stmt->fetchAll( \PDO::FETCH_ASSOC);
         $names  = array();
@@ -153,7 +153,7 @@ class Database {
 
     /**
      * Get all collections in the database
-     * 
+     *
      * @return array
      */
     public function listCollections() {
@@ -169,14 +169,14 @@ class Database {
 
     /**
      * Select collection
-     * 
+     *
      * @param  string $name
      * @return object
      */
     public function selectCollection($name) {
 
         if(!isset($this->collections[$name])) {
-            
+
             if(!in_array($name, $this->getCollectionNames())) {
                 $this->createCollection($name);
             }
@@ -188,7 +188,7 @@ class Database {
     }
 
     public function __get($collection) {
-        
+
         return $this->selectCollection($collection);
     }
 }
@@ -201,7 +201,7 @@ class UtilArrayQuery {
         $fn = array();
 
         foreach ($criteria as $key => $value) {
-            
+
             switch($key) {
 
                 case '$and':
@@ -225,23 +225,26 @@ class UtilArrayQuery {
                         $d .= '["'.$key.'"]';
                     }
 
-                    $fn[] = is_array($value) ? "\\MongoLite\\UtilArrayQuery::check({$d}, ".var_export($value, true).")": "({$d}==".(is_string($value) ? "'{$value}'": $value).")";
+                    $fn[] = is_array($value) ? "\\MongoLite\\UtilArrayQuery::check((isset({$d}) ? {$d} : null), ".var_export($value, true).")": "(isset({$d}) && {$d}==".(is_string($value) ? "'{$value}'": var_export($value, true)).")";
             }
         }
 
         return count($fn) ? trim(implode($concat, $fn)) : 'true';
     }
-    
+
 
     public static function check($value, $condition) {
+
+        if(is_null($value)) return false;
+
         $keys  = array_keys($condition);
         $func  = $keys[0];
-        
+
         return self::evaluate($func, $value, $condition[$func]);
     }
 
     private static function evaluate($func, $a, $b) {
-        
+
         $r = false;
 
         switch ($func) {
@@ -312,7 +315,7 @@ class UtilArrayQuery {
                 break;
 
             default :
-                throw new ErrorException("Condition not valid ... Use \$fn for custom operations");
+                throw new \ErrorException("Condition not valid ... Use {$func} for custom operations");
                 break;
         }
 
