@@ -39,9 +39,27 @@ class Collection {
      * Insert document
      * 
      * @param  array $document
-     * @return mixed
+     * @return mixed last_insert_id for single document or
+     * count count of inserted documents for arrays
      */
     public function insert(&$document) {
+        $d = json_decode(json_encode($document, JSON_NUMERIC_CHECK));
+        if (is_object($d)) {
+            return $this->internal_insert($document);
+        } else {
+            foreach ($document as $key => $value) {
+                $res = $this->internal_insert($value);
+            }
+            return count($document);
+        }
+    }
+    /**
+     * Insert document
+     * 
+     * @param  array $document
+     * @return mixed
+     */
+    private function internal_insert(&$document) {
         
         $table           = $this->name;
         $document["_id"] = uniqid().'doc'.rand();
