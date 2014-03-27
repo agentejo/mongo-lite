@@ -43,8 +43,7 @@ class Collection {
      * count count of inserted documents for arrays
      */
     public function insert(&$document) {
-        $d = json_decode(json_encode($document, JSON_NUMERIC_CHECK));
-        if (is_object($d)) {
+        if (isset($document[0])) {
             return $this->internal_insert($document);
         } else {
             foreach ($document as $key => $value) {
