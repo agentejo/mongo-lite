@@ -44,12 +44,18 @@ class Collection {
      */
     public function insert(&$document) {
         if (isset($document[0])) {
-            return $this->internal_insert($document);
-        } else {
+            $this->database->connection->beginTransaction();
             foreach ($document as $key => $value) {
                 $res = $this->internal_insert($value);
+                if(!$res) {
+                    $this->database->connection->rollBack();
+                    return $res; 
+                }
             }
+            $this->database->connection->commit();
             return count($document);
+        } else {
+            return $this->internal_insert($document);
         }
     }
     /**
