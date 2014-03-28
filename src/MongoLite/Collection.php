@@ -39,9 +39,32 @@ class Collection {
      * Insert document
      * 
      * @param  array $document
-     * @return mixed
+     * @return mixed last_insert_id for single document or
+     * count count of inserted documents for arrays
      */
     public function insert(&$document) {
+        if (isset($document[0])) {
+            $this->database->connection->beginTransaction();
+            foreach ($document as $key => $value) {
+                $res = $this->internal_insert($value);
+                if(!$res) {
+                    $this->database->connection->rollBack();
+                    return $res; 
+                }
+            }
+            $this->database->connection->commit();
+            return count($document);
+        } else {
+            return $this->internal_insert($document);
+        }
+    }
+    /**
+     * Insert document
+     * 
+     * @param  array $document
+     * @return mixed
+     */
+    private function internal_insert(&$document) {
         
         $table           = $this->name;
         $document["_id"] = uniqid().'doc'.rand();
