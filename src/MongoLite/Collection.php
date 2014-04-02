@@ -19,8 +19,8 @@ class Collection {
 
     /**
      * Constructor
-     * 
-     * @param string $name    
+     *
+     * @param string $name
      * @param object $database
      */
     public function __construct($name, $database) {
@@ -37,7 +37,7 @@ class Collection {
 
     /**
      * Insert document
-     * 
+     *
      * @param  array $document
      * @return mixed last_insert_id for single document or
      * count count of inserted documents for arrays
@@ -46,26 +46,26 @@ class Collection {
         if (isset($document[0])) {
             $this->database->connection->beginTransaction();
             foreach ($document as $key => $value) {
-                $res = $this->internal_insert($value);
+                $res = $this->_insert($value);
                 if(!$res) {
                     $this->database->connection->rollBack();
-                    return $res; 
+                    return $res;
                 }
             }
             $this->database->connection->commit();
             return count($document);
         } else {
-            return $this->internal_insert($document);
+            return $this->_insert($document);
         }
     }
     /**
      * Insert document
-     * 
+     *
      * @param  array $document
      * @return mixed
      */
-    private function internal_insert(&$document) {
-        
+    protected function _insert(&$document) {
+
         $table           = $this->name;
         $document["_id"] = uniqid().'doc'.rand();
         $data            = array("document" => json_encode($document, JSON_NUMERIC_CHECK));
@@ -77,7 +77,7 @@ class Collection {
             $fields[] = "`{$col}`";
             $values[] = (is_null($value) ? 'NULL':$this->database->connection->quote($value));
         }
-        
+
         $fields = implode(',', $fields);
         $values = implode(',', $values);
 
@@ -95,7 +95,7 @@ class Collection {
 
     /**
      * Save document
-     * 
+     *
      * @param  array $document
      * @return mixed
      */
@@ -106,9 +106,9 @@ class Collection {
 
     /**
      * Update documents
-     * 
+     *
      * @param  mixed $criteria
-     * @param  array $data    
+     * @param  array $data
      * @return integer
      */
     public function update($criteria, $data) {
@@ -118,7 +118,7 @@ class Collection {
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach($result as &$doc) {
-            
+
             $document = array_merge(json_decode($doc["document"], true), $data);
 
             $sql = "UPDATE ".$this->name." SET document=".$this->database->connection->quote(json_encode($document,JSON_NUMERIC_CHECK))." WHERE id=".$doc["id"];
@@ -131,7 +131,7 @@ class Collection {
 
     /**
      * Remove documents
-     * 
+     *
      * @param  mixed $criteria
      * @return mixed
      */
@@ -149,13 +149,13 @@ class Collection {
      * @return integer
      */
     public function count($criteria = null) {
-        
+
         return $this->find($criteria)->count();
     }
 
     /**
      * Find documents
-     * 
+     *
      * @param  mixed $criteria
      * @return object Cursor
      */
@@ -165,24 +165,24 @@ class Collection {
 
     /**
      * Find one document
-     * 
+     *
      * @param  mixed $criteria
      * @return array
      */
     public function findOne($criteria = null) {
         $items = $this->find($criteria)->limit(1)->toArray();
 
-        return isset($items[0]) ? $items[0]:null; 
+        return isset($items[0]) ? $items[0]:null;
     }
 
     /**
      * Rename Collection
-     * 
+     *
      * @param  string $newname [description]
      * @return boolean
      */
     public function renameCollection($newname) {
-        
+
         if (!in_array($newname, $this->getCollectionNames())) {
 
             $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$newname}");
