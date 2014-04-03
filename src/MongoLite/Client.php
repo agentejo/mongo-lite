@@ -11,7 +11,7 @@ class Client {
      * @var array
      */
     protected $databases = array();
-    
+
     /**
      * @var string
      */
@@ -24,8 +24,8 @@ class Client {
 
     /**
      * Constructor
-     * 
-     * @param string $path   
+     *
+     * @param string $path
      * @param array  $options
      */
     public function __construct($path, $options=array()) {
@@ -35,11 +35,11 @@ class Client {
 
     /**
      * List Databases
-     * 
+     *
      * @return array List of databases
      */
     public function listDBs() {
-        
+
         $databases = array();
 
         foreach (new \DirectoryIterator($this->path) as $fileInfo) {
@@ -53,10 +53,10 @@ class Client {
 
     /**
      * Select Collection
-     * 
-     * @param  string $database  
+     *
+     * @param  string $database
      * @param  string $collection
-     * @return object            
+     * @return object
      */
     public function selectCollection($database, $collection) {
 
@@ -65,12 +65,12 @@ class Client {
 
     /**
      * Select database
-     * 
+     *
      * @param  string $name
      * @return object
      */
     public function selectDB($name) {
-        
+
         if(!isset($this->databases[$name])) {
             $this->databases[$name] = new Database($this->path.'/'.$name.'.sqlite', $this->options);
         }
@@ -79,7 +79,7 @@ class Client {
     }
 
     public function __get($database) {
-        
+
         return $this->selectDB($database);
     }
 }
