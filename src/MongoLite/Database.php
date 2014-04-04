@@ -296,7 +296,7 @@ class UtilArrayQuery {
             case '$preg' :
             case '$match':
 
-                $r = (boolean) preg_match($b, $a, $match);
+                $r = (boolean) @preg_match('/'.$b.'/', $a, $match);
                 break;
 
             case '$size':
