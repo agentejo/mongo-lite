@@ -5,7 +5,7 @@ Schemaless database on top of SqLite
 
 
 ###Sample Usage
-
+''' php
     $client     = new MongoLite\Client(PATH_TO_WRITABLE_FOLDER);
     $database   = $client->testdb;
     $collection = $database->products;
@@ -22,7 +22,7 @@ Schemaless database on top of SqLite
             var_dump($product);
         }
     }
-
+'''
 
 
 ###Query collection
