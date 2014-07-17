@@ -5,97 +5,104 @@ Schemaless database on top of SqLite
 
 
 ###Sample Usage
+
 ``` php
- $client     = new MongoLite\Client(PATH_TO_WRITABLE_FOLDER);
- $database   = $client->testdb;
- $collection = $database->products;
+$client     = new MongoLite\Client(PATH_TO_WRITABLE_FOLDER);
+$database   = $client->testdb;
+$collection = $database->products;
 
- $entry = ["name"=>"Super cool Product", "price"=>20];
+$entry = ["name"=>"Super cool Product", "price"=>20];
 
- $collection->insert($entry);
+$collection->insert($entry);
 
- $products = $collection->find(); // Get Cursor
+$products = $collection->find(); // Get Cursor
 
- if ($products->count()) {
-        
+if ($products->count()) {
+
     foreach($products->sort(["price"=>1])->limit(5) as $product) {
         var_dump($product);
     }
- }
+}
 ```
-
 
 ###Query collection
 
 In general you can use a callback or simple array as criteria
+
 ``` php
-    $collection->find(function($document) {   // recommended to query data
-        return $document["price"] > 10;
-    });
+$collection->find(function($document) {   // recommended to query data
+    return $document["price"] > 10;
+});
 
-    //or
+//or
 
-    $collection->find(["price"=>['$gt'=>10]]); // only very simple criteria is supported (can be slow)
+$collection->find(["price"=>['$gt'=>10]]); // only very simple criteria is supported (can be slow)
 
-    //or just one
+//or just one
 
-    $collection->findOne(function($document) { ... });
-    $collection->findOne([...]);
+$collection->findOne(function($document) { ... });
+$collection->findOne([...]);
 ```
 
 ###Writing documents
+
 ``` php
-    $collection->insert($document);
-    $collection->save($document);
-    $collection->update($criteria, $data);
+$collection->insert($document);
+$collection->save($document);
+$collection->update($criteria, $data);
 ```
 
 ###Delete documents
-``` php    
-    $collection->remove($criteria);
+
+``` php
+$collection->remove($criteria);
 ```
 
 ##API
 
 **Client**
+
 ``` php
-    Client::listDBs()
-    Client::selectDB(databasename)
-    Client::selectCollection(databasename, collectionname)
+Client::listDBs()
+Client::selectDB(databasename)
+Client::selectCollection(databasename, collectionname)
 ```
 
 **Database**
+
 ``` php
-    Database::vacuum()
-    Database::drop()
-    Database::createCollection(collectionname)
-    Database::dropCollection(collectionname)
-    Database::getCollectionNames()
-    Database::listCollections()
-    Database::selectCollection(collectionname)
+Database::vacuum()
+Database::drop()
+Database::createCollection(collectionname)
+Database::dropCollection(collectionname)
+Database::getCollectionNames()
+Database::listCollections()
+Database::selectCollection(collectionname)
 ```
 
 **Collection**
+
 ``` php
-    Collection::drop()
-    Collection::renameCollection(newname)
-    Collection::insert(document)
-    Collection::save(document)
-    Collection::update(criteria, data)
-    Collection::remove(criteria)
-    Collection::count()
-    Collection::find(criteria)
-    Collection::findOne(criteria)
+Collection::drop()
+Collection::renameCollection(newname)
+Collection::insert(document)
+Collection::save(document)
+Collection::update(criteria, data)
+Collection::remove(criteria)
+Collection::count()
+Collection::find(criteria)
+Collection::findOne(criteria)
 ```
 
 **Cursor**
+
 ``` php
-    Cursor::count()
-    Cursor::limit(number)
-    Cursor::skip(number)
-    Cursor::sort(array)
-    Cursor::each($callable)
-    Cursor::toArray()
+Cursor::count()
+Cursor::limit(number)
+Cursor::skip(number)
+Cursor::sort(array)
+Cursor::each($callable)
+Cursor::toArray()
 ```
 
 ##Installation
