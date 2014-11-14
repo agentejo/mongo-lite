@@ -43,10 +43,16 @@ class Collection {
      * count count of inserted documents for arrays
      */
     public function insert(&$document) {
+
         if (isset($document[0])) {
+
             $this->database->connection->beginTransaction();
-            foreach ($document as $key => $value) {
-                $res = $this->_insert($value);
+
+            foreach ($document as &$doc) {
+
+                if(!is_array($doc)) continue;
+
+                $res = $this->_insert($doc);
                 if(!$res) {
                     $this->database->connection->rollBack();
                     return $res;
@@ -159,8 +165,8 @@ class Collection {
      * @param  mixed $criteria
      * @return object Cursor
      */
-    public function find($criteria = null) {
-        return new Cursor($this, $this->database->registerCriteriaFunction($criteria));
+    public function find($criteria = null, $projection = null) {
+        return new Cursor($this, $this->database->registerCriteriaFunction($criteria), $projection);
     }
 
     /**
@@ -169,8 +175,9 @@ class Collection {
      * @param  mixed $criteria
      * @return array
      */
-    public function findOne($criteria = null) {
-        $items = $this->find($criteria)->limit(1)->toArray();
+    public function findOne($criteria = null, $projection = null) {
+
+        $items = $this->find($criteria, $projection)->limit(1)->toArray();
 
         return isset($items[0]) ? $items[0]:null;
     }
