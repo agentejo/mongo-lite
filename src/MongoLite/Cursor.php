@@ -197,8 +197,8 @@ class Cursor implements \Iterator{
 
         } else {
 
-            $exclude = [];
-            $include = [];
+            $exclude = array();
+            $include = array();
 
             foreach($this->projection as $key => $value) {
 
@@ -270,7 +270,7 @@ class Cursor implements \Iterator{
 
 function array_key_intersect(&$a, &$b) {
 
-    $array = [];
+    $array = array();
 
     while (list($key,$value) = each($a)) {
         if (isset($b[$key])) $array[$key] = $value;
