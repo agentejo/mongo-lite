@@ -287,7 +287,7 @@ class UtilArrayQuery {
             case '$has' :
                 if (is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $has array not supported');
-                $a = @json_decode($a, true) ?  : array();
+                #$a = @json_decode($a, true) ?  : array();
                 $r = in_array($b, $a);
                 break;
 
@@ -298,7 +298,7 @@ class UtilArrayQuery {
                 break;
 
             case '$all' :
-                $a = @json_decode($a, true) ?  : array();
+                #$a = @json_decode($a, true) ?  : array();
                 if (! is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $all option must be array');
                 $r = count(array_intersect_key($a, $b)) == count($b);
@@ -311,7 +311,7 @@ class UtilArrayQuery {
                 break;
 
             case '$size' :
-                $a = @json_decode($a, true) ?  : array();
+                #$a = @json_decode($a, true) ?  : array();
                 $r = (int) $b == count($a);
                 break;
 
