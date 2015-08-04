@@ -259,19 +259,23 @@ class UtilArrayQuery {
             case '$not' :
                 $r = $a != $b;
                 break;
+                
             case '$gte' :
+                $r = $a >= $b;
+                break;
+
             case '$gt' :
-                if (is_numeric($a) && is_numeric($b)) {
-                    $r = $a > $b;
-                }
+                $r = $a > $b;
                 break;
 
             case '$lte' :
-            case '$lt' :
-                if (is_numeric($a) && is_numeric($b)) {
-                    $r = $a < $b;
-                }
+                $r = $a <= $b;
                 break;
+
+            case '$lt' :
+                $r = $a < $b;
+                break;
+
             case '$in' :
                 if (! is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $in option must be array');
