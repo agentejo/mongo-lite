@@ -259,50 +259,34 @@ class UtilArrayQuery {
             case '$not' :
                 $r = $a != $b;
                 break;
-                
             case '$gte' :
-                $r = $a >= $b;
-                break;
-
             case '$gt' :
-                $r = $a > $b;
+                if (is_numeric($a) && is_numeric($b)) {
+                    $r = $a > $b;
+                }
                 break;
 
             case '$lte' :
-                $r = $a <= $b;
-                break;
-
             case '$lt' :
-                $r = $a < $b;
+                if (is_numeric($a) && is_numeric($b)) {
+                    $r = $a < $b;
+                }
                 break;
-
             case '$in' :
                 if (! is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $in option must be array');
                 $r = in_array($a, $b);
                 break;
 
-            case '$nin' :
-                if (! is_array($b))
-                    throw new \InvalidArgumentException('Invalid argument for $nin option must be array');
-                $r = !in_array($a, $b);
-                break;
-
             case '$has' :
                 if (is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $has array not supported');
-                #$a = @json_decode($a, true) ?  : array();
+                $a = @json_decode($a, true) ?  : array();
                 $r = in_array($b, $a);
                 break;
 
-            case '$nhas' :
-                if (is_array($b))
-                    throw new \InvalidArgumentException('Invalid argument for $nhas array not supported');
-                $r = !in_array($b, $a);
-                break;
-
             case '$all' :
-                #$a = @json_decode($a, true) ?  : array();
+                $a = @json_decode($a, true) ?  : array();
                 if (! is_array($b))
                     throw new \InvalidArgumentException('Invalid argument for $all option must be array');
                 $r = count(array_intersect_key($a, $b)) == count($b);
@@ -311,11 +295,11 @@ class UtilArrayQuery {
             case '$regex' :
             case '$preg' :
             case '$match' :
-                $r = (boolean) @preg_match('/'.$b.'/', $a, $match);
+                $r = (boolean) @preg_match(isset($b[0]) && $b[0]=='/' ? $b : '/'.$b.'/i', $a, $match);
                 break;
 
             case '$size' :
-                #$a = @json_decode($a, true) ?  : array();
+                $a = @json_decode($a, true) ?  : array();
                 $r = (int) $b == count($a);
                 break;
 
