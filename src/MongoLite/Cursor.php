@@ -228,7 +228,7 @@ class Cursor implements \Iterator{
                 }
 
                 if ($include) {
-                    $item = array_key_intersect($item, $include);
+                    $item = array_intersect_key($item, $include);
                 }
 
                 if (!isset($exclude["_id"])) {
@@ -275,17 +275,4 @@ class Cursor implements \Iterator{
         return isset($this->data[$this->position]);
     }
 
-}
-
-function array_key_intersect(&$a, &$b) {
-
-    $array = [];
-
-    while (list($key,$value) = each($a)) {
-        if (isset($b[$key])) {
-            $array[$key] = $value;
-        }
-    }
-
-    return $array;
 }
