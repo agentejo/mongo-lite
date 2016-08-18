@@ -147,13 +147,8 @@ class Database {
 
         $stmt   = $this->connection->query("SELECT name FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence';");
         $tables = $stmt->fetchAll( \PDO::FETCH_ASSOC);
-        $names  = array();
 
-        foreach($tables as $table) {
-            $names[] = $table["name"];
-        }
-
-        return $names;
+        return array_column($tables, 'name');
     }
 
     /**
