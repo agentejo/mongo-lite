@@ -8,3 +8,5 @@ Icon?
 Thumbs.db
 /nbproject
 /vendor
+/.idea
+composer.lock

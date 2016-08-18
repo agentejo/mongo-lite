@@ -202,7 +202,7 @@ class Collection {
      */
     public function renameCollection($new_name) {
 
-        if (in_array($new_name, $this->database->getCollectionNames())) {
+        if (!in_array($new_name, $this->database->getCollectionNames())) {
             return false;
         }
 
