@@ -8,12 +8,12 @@ namespace MongoLite;
 class Database {
 
     /**
-     * @var PDO object
+     * @var \PDO
      */
     public $connection;
 
     /**
-     * @var array
+     * @var Collection[]
      */
     protected $collections = array();
 
@@ -32,7 +32,7 @@ class Database {
      * Constructor
      *
      * @param string $path
-     * @param array  $options
+     * @param array $options
      */
     public function __construct($path = ":memory:", $options = array()) {
 
@@ -47,14 +47,16 @@ class Database {
 
             $document = json_decode($document, true);
 
-            return isset($document[$key]) ? $document[$key] : '';
+            if (!isset($document[$key])) return '';
+
+            return $document[$key];
         }, 2);
 
-        $this->connection->sqliteCreateFunction('document_criteria', function($funcid, $document) use($database) {
+        $this->connection->sqliteCreateFunction('document_criteria', function($function_id, $document) use($database) {
 
             $document = json_decode($document, true);
 
-            return $database->callCriteriaFunction($funcid, $document);
+            return $database->callCriteriaFunction($function_id, $document);
         }, 2);
 
         $this->connection->exec('PRAGMA journal_mode = MEMORY');
@@ -77,18 +79,17 @@ class Database {
            return $id;
         }
 
-        if (is_array($criteria)) {
-
-            $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
-
-            return $id;
+        if (!is_array($criteria)) {
+            return null;
         }
 
-        return null;
+        $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
+
+        return $id;
     }
 
     /**
-     * Execute registred criteria function
+     * Execute registered criteria function
      *
      * @param  string $id
      * @param  array $document
@@ -96,7 +97,11 @@ class Database {
      */
     public function callCriteriaFunction($id, $document) {
 
-        return isset($this->document_criterias[$id]) ? $this->document_criterias[$id]($document):false;
+        if(!isset($this->document_criterias[$id])) {
+            return false;
+        }
+
+        return $this->document_criterias[$id]($document);
     }
 
     /**
@@ -136,7 +141,7 @@ class Database {
     /**
      * Get all collection names in the database
      *
-     * @return array
+     * @return string[]
      */
     public function getCollectionNames() {
 
@@ -154,7 +159,7 @@ class Database {
     /**
      * Get all collections in the database
      *
-     * @return array
+     * @return \MongoLite\Collection[]
      */
     public function listCollections() {
 
@@ -171,7 +176,7 @@ class Database {
      * Select collection
      *
      * @param  string $name
-     * @return object
+     * @return \MongoLite\Collection
      */
     public function selectCollection($name) {
 

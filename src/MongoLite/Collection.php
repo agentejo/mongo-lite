@@ -8,7 +8,7 @@ namespace MongoLite;
 class Collection {
 
     /**
-     * @var object Database
+     * @var \MongoLite\Database
      */
     public $database;
 
@@ -44,31 +44,33 @@ class Collection {
      */
     public function insert(&$document) {
 
-        if (isset($document[0])) {
-
-            $this->database->connection->beginTransaction();
-
-            foreach ($document as &$doc) {
-
-                if(!is_array($doc)) continue;
-
-                $res = $this->_insert($doc);
-                if(!$res) {
-                    $this->database->connection->rollBack();
-                    return $res;
-                }
-            }
-            $this->database->connection->commit();
-            return count($document);
-        } else {
+        if (!isset($document[0])) {
             return $this->_insert($document);
         }
+
+        $this->database->connection->beginTransaction();
+
+        foreach ($document as &$doc) {
+
+            if(!is_array($doc)) continue;
+
+            $res = $this->_insert($doc);
+            if(!$res) {
+                $this->database->connection->rollBack();
+                return $res;
+            }
+        }
+
+        $this->database->connection->commit();
+
+        return count($document);
     }
+
     /**
      * Insert document
      *
      * @param  array $document
-     * @return mixed
+     * @return integer|false
      */
     protected function _insert(&$document) {
 
@@ -91,12 +93,12 @@ class Collection {
 
         $res = $this->database->connection->exec($sql);
 
-        if($res){
-            return $this->database->connection->lastInsertId();
-        }else{
+        if(!$res) {
             trigger_error('SQL Error: '.implode(', ', $this->database->connection->errorInfo()).":\n".$sql);
             return false;
         }
+
+        return $this->database->connection->lastInsertId();
     }
 
     /**
@@ -107,7 +109,11 @@ class Collection {
      */
     public function save(&$document) {
 
-        return isset($document["_id"]) ? $this->update(array("_id" => $document["_id"]), $document) : $this->insert($document);
+        if (!isset($document["_id"])) {
+            $this->insert($document);
+        }
+
+        return $this->update(array("_id" => $document["_id"]), $document);
     }
 
     /**
@@ -139,7 +145,7 @@ class Collection {
      * Remove documents
      *
      * @param  mixed $criteria
-     * @return mixed
+     * @return integer|false
      */
     public function remove($criteria) {
 
@@ -163,7 +169,8 @@ class Collection {
      * Find documents
      *
      * @param  mixed $criteria
-     * @return object Cursor
+     * @param mixed $projection
+     * @return \MongoLite\Cursor
      */
     public function find($criteria = null, $projection = null) {
         return new Cursor($this, $this->database->registerCriteriaFunction($criteria), $projection);
@@ -173,32 +180,36 @@ class Collection {
      * Find one document
      *
      * @param  mixed $criteria
+     * @param mixed $projection
      * @return array
      */
     public function findOne($criteria = null, $projection = null) {
 
         $items = $this->find($criteria, $projection)->limit(1)->toArray();
 
-        return isset($items[0]) ? $items[0]:null;
+        if (!isset($items[0])) {
+            return null;
+        }
+
+        return $items[0];
     }
 
     /**
      * Rename Collection
      *
-     * @param  string $newname [description]
+     * @param  string $new_name [description]
      * @return boolean
      */
-    public function renameCollection($newname) {
+    public function renameCollection($new_name) {
 
-        if (!in_array($newname, $this->getCollectionNames())) {
-
-            $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$newname}");
-
-            $this->name = $newname;
-
-            return true;
+        if (in_array($new_name, $this->database->getCollectionNames())) {
+            return false;
         }
 
-        return false;
+        $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$new_name}");
+
+        $this->name = $new_name;
+
+        return true;
     }
 }

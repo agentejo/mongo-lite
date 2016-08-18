@@ -36,7 +36,7 @@ class Client {
     /**
      * List Databases
      * 
-     * @return array List of databases
+     * @return \MongoLite\Database[] List of databases
      */
     public function listDBs() {
         
@@ -56,7 +56,7 @@ class Client {
      * 
      * @param  string $database  
      * @param  string $collection
-     * @return object            
+     * @return \MongoLite\Collection
      */
     public function selectCollection($database, $collection) {
 
@@ -67,7 +67,7 @@ class Client {
      * Select database
      * 
      * @param  string $name
-     * @return object
+     * @return \MongoLite\Database
      */
     public function selectDB($name) {
         
