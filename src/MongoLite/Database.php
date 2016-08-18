@@ -249,80 +249,79 @@ class UtilArrayQuery {
     }
 
     private static function evaluate($func, $a, $b) {
-
-        $r = false;
-
         switch ($func) {
             case '$eq' :
-                $r = $a == $b;
-                break;
+                return $a == $b;
             case '$not' :
-                $r = $a != $b;
-                break;
+                return $a != $b;
             case '$gte' :
             case '$gt' :
-                if (is_numeric($a) && is_numeric($b)) {
-                    $r = $a > $b;
+                if (!is_numeric($a) || !is_numeric($b)) {
+                    throw new \InvalidArgumentException('Invalid argument for $gt. Both arguments must be numeric');
                 }
-                break;
+                return $a > $b;
 
             case '$lte' :
             case '$lt' :
-                if (is_numeric($a) && is_numeric($b)) {
-                    $r = $a < $b;
+                if (!is_numeric($a) || !is_numeric($b)) {
+                    throw new \InvalidArgumentException('Invalid argument for $gt. Both arguments must be numeric');
                 }
-                break;
+                return $a < $b;
+
             case '$in' :
-                if (! is_array($b))
-                    throw new \InvalidArgumentException('Invalid argument for $in option must be array');
-                $r = in_array($a, $b);
-                break;
+                if (!is_array($b)) {
+                    throw new \InvalidArgumentException('Invalid argument for $in. Option must be array');
+                }
+                return in_array($a, $b);
 
             case '$has' :
-                if (is_array($b))
-                    throw new \InvalidArgumentException('Invalid argument for $has array not supported');
-                $a = @json_decode($a, true) ?  : array();
-                $r = in_array($b, $a);
-                break;
+                if (is_array($b)) {
+                    throw new \InvalidArgumentException('Invalid argument for $has. Array not supported');
+                }
+                $a = @json_decode($a, true) ?: array();
+                return in_array($b, $a);
 
             case '$all' :
-                $a = @json_decode($a, true) ?  : array();
-                if (! is_array($b))
-                    throw new \InvalidArgumentException('Invalid argument for $all option must be array');
-                $r = count(array_intersect_key($a, $b)) == count($b);
-                break;
+                $a = json_decode($a, true);
+                if (!$a) {
+                    throw new \RuntimeException('Runtime error in $all json_decode: ' . json_last_error_msg());
+                }
+
+                if (!is_array($b)) {
+                    throw new \InvalidArgumentException('Invalid argument for $all. Option must be array');
+                }
+
+                return count(array_intersect_key($a, $b)) == count($b);
 
             case '$regex' :
             case '$preg' :
             case '$match' :
-                $r = (boolean) @preg_match(isset($b[0]) && $b[0]=='/' ? $b : '/'.$b.'/i', $a, $match);
-                break;
+                return (boolean)@preg_match(isset($b[0]) && $b[0] == '/' ? $b : '/' . $b . '/i', $a, $match);
 
             case '$size' :
-                $a = @json_decode($a, true) ?  : array();
-                $r = (int) $b == count($a);
-                break;
+                $a = json_decode($a, true);
+                if (!$a) {
+                    throw new \RuntimeException('Runtime error in $size json_decode: ' . json_last_error_msg());
+                }
+                return (int)$b == count($a);
 
             case '$mod' :
-                if (! is_array($b))
+                if (!is_array($b)) {
                     throw new \InvalidArgumentException('Invalid argument for $mod option must be array');
+                }
                 list($x, $y) = each($b);
-                $r = $a % $x == 0;
-                break;
+                return $a % $x == 0;
 
             case '$func' :
             case '$fn' :
             case '$f' :
-                if (! is_callable($b))
+                if (!is_callable($b)) {
                     throw new \InvalidArgumentException('Function should be callable');
-                $r = $b($a);
-                break;
+                }
+                return $b($a);
 
             default :
                 throw new \ErrorException("Condition not valid ... Use {$func} for custom operations");
-                break;
         }
-
-        return $r;
     }
 }
