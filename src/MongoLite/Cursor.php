@@ -1,6 +1,7 @@
 <?php
 
 namespace MongoLite;
+use PDO;
 
 /**
  * Cursor object.
@@ -18,7 +19,7 @@ class Cursor implements \Iterator{
     protected $data = array();
 
     /**
-     * @var Collection object
+     * @var Collection
      */
     protected $collection;
 
@@ -33,17 +34,17 @@ class Cursor implements \Iterator{
     protected $projection;
 
     /**
-     * @var null|integer
+     * @var integer|null
      */
     protected $limit;
 
     /**
-     * @var null|integer
+     * @var integer|null
      */
     protected $skip;
 
     /**
-     * @var null|array
+     * @var array|null
      */
     protected $sort;
 
@@ -52,6 +53,7 @@ class Cursor implements \Iterator{
      *
      * @param object $collection
      * @param mixed $criteria
+     * @param mixed $projection
      */
     public function __construct($collection, $criteria, $projection = null) {
         $this->collection  = $collection;
@@ -92,7 +94,7 @@ class Cursor implements \Iterator{
      * Set limit
      *
      * @param  mixed $limit
-     * @return object       Cursor
+     * @return \MongoLite\Cursor
      */
     public function limit($limit) {
 
@@ -105,7 +107,7 @@ class Cursor implements \Iterator{
      * Set sort
      *
      * @param  mixed $sorts
-     * @return object       Cursor
+     * @return \MongoLite\Cursor
      */
     public function sort($sorts) {
 
@@ -118,7 +120,7 @@ class Cursor implements \Iterator{
      * Set skip
      *
      * @param  mixed $skip
-     * @return object       Cursor
+     * @return \MongoLite\Cursor
      */
     public function skip($skip) {
 
@@ -131,7 +133,7 @@ class Cursor implements \Iterator{
      * Loop through result set
      *
      * @param  mixed $callable
-     * @return object
+     * @return \MongoLite\Cursor
      */
     public function each($callable) {
 

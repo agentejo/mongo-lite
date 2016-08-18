@@ -8,12 +8,12 @@ namespace MongoLite;
 class Database {
 
     /**
-     * @var PDO object
+     * @var \PDO
      */
     public $connection;
 
     /**
-     * @var array
+     * @var Collection[]
      */
     protected $collections = array();
 
@@ -32,7 +32,7 @@ class Database {
      * Constructor
      *
      * @param string $path
-     * @param array  $options
+     * @param array $options
      */
     public function __construct($path = ":memory:", $options = array()) {
 
@@ -88,7 +88,7 @@ class Database {
     }
 
     /**
-     * Execute registred criteria function
+     * Execute registered criteria function
      *
      * @param  string $id
      * @param  array $document
@@ -136,7 +136,7 @@ class Database {
     /**
      * Get all collection names in the database
      *
-     * @return array
+     * @return string[]
      */
     public function getCollectionNames() {
 
@@ -154,7 +154,7 @@ class Database {
     /**
      * Get all collections in the database
      *
-     * @return array
+     * @return \MongoLite\Collection[]
      */
     public function listCollections() {
 
@@ -171,7 +171,7 @@ class Database {
      * Select collection
      *
      * @param  string $name
-     * @return object
+     * @return \MongoLite\Collection
      */
     public function selectCollection($name) {
 

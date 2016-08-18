@@ -8,7 +8,7 @@ namespace MongoLite;
 class Collection {
 
     /**
-     * @var object Database
+     * @var \MongoLite\Database
      */
     public $database;
 
@@ -68,7 +68,7 @@ class Collection {
      * Insert document
      *
      * @param  array $document
-     * @return mixed
+     * @return integer|false
      */
     protected function _insert(&$document) {
 
@@ -139,7 +139,7 @@ class Collection {
      * Remove documents
      *
      * @param  mixed $criteria
-     * @return mixed
+     * @return integer|false
      */
     public function remove($criteria) {
 
@@ -163,7 +163,8 @@ class Collection {
      * Find documents
      *
      * @param  mixed $criteria
-     * @return object Cursor
+     * @param mixed $projection
+     * @return \MongoLite\Cursor
      */
     public function find($criteria = null, $projection = null) {
         return new Cursor($this, $this->database->registerCriteriaFunction($criteria), $projection);
@@ -173,6 +174,7 @@ class Collection {
      * Find one document
      *
      * @param  mixed $criteria
+     * @param mixed $projection
      * @return array
      */
     public function findOne($criteria = null, $projection = null) {
@@ -185,7 +187,7 @@ class Collection {
     /**
      * Rename Collection
      *
-     * @param  string $newname [description]
+     * @param  string $new_name [description]
      * @return boolean
      */
     public function renameCollection($newname) {
