@@ -44,26 +44,28 @@ class Collection {
      */
     public function insert(&$document) {
 
-        if (isset($document[0])) {
-
-            $this->database->connection->beginTransaction();
-
-            foreach ($document as &$doc) {
-
-                if(!is_array($doc)) continue;
-
-                $res = $this->_insert($doc);
-                if(!$res) {
-                    $this->database->connection->rollBack();
-                    return $res;
-                }
-            }
-            $this->database->connection->commit();
-            return count($document);
-        } else {
+        if (!isset($document[0])) {
             return $this->_insert($document);
         }
+
+        $this->database->connection->beginTransaction();
+
+        foreach ($document as &$doc) {
+
+            if(!is_array($doc)) continue;
+
+            $res = $this->_insert($doc);
+            if(!$res) {
+                $this->database->connection->rollBack();
+                return $res;
+            }
+        }
+
+        $this->database->connection->commit();
+
+        return count($document);
     }
+
     /**
      * Insert document
      *
@@ -91,12 +93,12 @@ class Collection {
 
         $res = $this->database->connection->exec($sql);
 
-        if($res){
-            return $this->database->connection->lastInsertId();
-        }else{
+        if(!$res) {
             trigger_error('SQL Error: '.implode(', ', $this->database->connection->errorInfo()).":\n".$sql);
             return false;
         }
+
+        return $this->database->connection->lastInsertId();
     }
 
     /**
@@ -107,7 +109,11 @@ class Collection {
      */
     public function save(&$document) {
 
-        return isset($document["_id"]) ? $this->update(array("_id" => $document["_id"]), $document) : $this->insert($document);
+        if (!isset($document["_id"])) {
+            $this->insert($document);
+        }
+
+        return $this->update(array("_id" => $document["_id"]), $document);
     }
 
     /**
@@ -181,7 +187,11 @@ class Collection {
 
         $items = $this->find($criteria, $projection)->limit(1)->toArray();
 
-        return isset($items[0]) ? $items[0]:null;
+        if (!isset($items[0])) {
+            return null;
+        }
+
+        return $items[0];
     }
 
     /**
@@ -190,17 +200,16 @@ class Collection {
      * @param  string $new_name [description]
      * @return boolean
      */
-    public function renameCollection($newname) {
+    public function renameCollection($new_name) {
 
-        if (!in_array($newname, $this->getCollectionNames())) {
-
-            $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$newname}");
-
-            $this->name = $newname;
-
-            return true;
+        if (in_array($new_name, $this->database->getCollectionNames())) {
+            return false;
         }
 
-        return false;
+        $this->database->connection->exec("ALTER TABLE '.$this->name.' RENAME TO {$new_name}");
+
+        $this->name = $new_name;
+
+        return true;
     }
 }

@@ -47,14 +47,16 @@ class Database {
 
             $document = json_decode($document, true);
 
-            return isset($document[$key]) ? $document[$key] : '';
+            if (!isset($document[$key])) return '';
+
+            return $document[$key];
         }, 2);
 
-        $this->connection->sqliteCreateFunction('document_criteria', function($funcid, $document) use($database) {
+        $this->connection->sqliteCreateFunction('document_criteria', function($function_id, $document) use($database) {
 
             $document = json_decode($document, true);
 
-            return $database->callCriteriaFunction($funcid, $document);
+            return $database->callCriteriaFunction($function_id, $document);
         }, 2);
 
         $this->connection->exec('PRAGMA journal_mode = MEMORY');
@@ -77,14 +79,13 @@ class Database {
            return $id;
         }
 
-        if (is_array($criteria)) {
-
-            $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
-
-            return $id;
+        if (!is_array($criteria)) {
+            return null;
         }
 
-        return null;
+        $this->document_criterias[$id] = create_function('$document','return '.UtilArrayQuery::buildCondition($criteria).';');
+
+        return $id;
     }
 
     /**
@@ -96,7 +97,11 @@ class Database {
      */
     public function callCriteriaFunction($id, $document) {
 
-        return isset($this->document_criterias[$id]) ? $this->document_criterias[$id]($document):false;
+        if(!isset($this->document_criterias[$id])) {
+            return false;
+        }
+
+        return $this->document_criterias[$id]($document);
     }
 
     /**

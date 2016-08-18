@@ -68,26 +68,32 @@ class Cursor implements \Iterator{
      */
     public function count() {
 
-        if (!$this->criteria) {
+        $sql = "SELECT COUNT(*) AS C FROM " . $this->collection->name;
 
-            $stmt = $this->collection->database->connection->query("SELECT COUNT(*) AS C FROM ".$this->collection->name);
+        if ($this->criteria) {
 
-        } else {
+            $temporary_sql = array($sql);
 
-            $sql = array('SELECT COUNT(*) AS C FROM '.$this->collection->name);
-
-            $sql[] = 'WHERE document_criteria("'.$this->criteria.'", document)';
+            $temporary_sql[] = 'WHERE document_criteria("' . $this->criteria . '", document)';
 
             if ($this->limit) {
-                $sql[] = 'LIMIT '.$this->limit;
+                $temporary_sql[] = 'LIMIT ' . $this->limit;
             }
 
-            $stmt = $this->collection->database->connection->query(implode(" ", $sql));
+            $sql = implode(" ", $temporary_sql);
         }
 
-        $res  = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt = $this->collection->database->connection->query($sql, PDO::FETCH_ASSOC);
 
-        return intval(isset($res['C']) ? $res['C']:0);
+        $result = $stmt->fetch();
+
+        $count = $result['C'];
+
+        if (!intval($count)) {
+            return 0;
+        }
+
+        return $count;
     }
 
     /**
@@ -164,7 +170,6 @@ class Cursor implements \Iterator{
         $sql = array('SELECT document FROM '.$this->collection->name);
 
         if ($this->criteria) {
-
             $sql[] = 'WHERE document_criteria("'.$this->criteria.'", document)';
         }
 
@@ -182,13 +187,15 @@ class Cursor implements \Iterator{
         if ($this->limit) {
             $sql[] = 'LIMIT '.$this->limit;
 
-            if ($this->skip) { $sql[] = 'OFFSET '.$this->skip; }
+            if ($this->skip) {
+                $sql[] = 'OFFSET '.$this->skip;
+            }
         }
 
         $sql = implode(' ', $sql);
 
-        $stmt      = $this->collection->database->connection->query($sql);
-        $result    = $stmt->fetchAll( \PDO::FETCH_ASSOC);
+        $stmt      = $this->collection->database->connection->query($sql, PDO::FETCH_ASSOC);
+        $result    = $stmt->fetchAll();
         $documents = array();
 
         if (!$this->projection) {
@@ -275,7 +282,9 @@ function array_key_intersect(&$a, &$b) {
     $array = [];
 
     while (list($key,$value) = each($a)) {
-        if (isset($b[$key])) $array[$key] = $value;
+        if (isset($b[$key])) {
+            $array[$key] = $value;
+        }
     }
 
     return $array;
