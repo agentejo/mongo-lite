@@ -4,7 +4,7 @@ MongoLite
 Schemaless database on top of SqLite
 
 
-###Sample Usage
+### Sample Usage
 
 ``` php
 $client     = new MongoLite\Client(PATH_TO_WRITABLE_FOLDER);
@@ -25,7 +25,7 @@ if ($products->count()) {
 }
 ```
 
-###Query collection
+### Query collection
 
 In general you can use a callback or simple array as criteria
 
@@ -44,7 +44,7 @@ $collection->findOne(function($document) { ... });
 $collection->findOne([...]);
 ```
 
-###Writing documents
+### Writing documents
 
 ``` php
 $collection->insert($document);
@@ -52,7 +52,7 @@ $collection->save($document);
 $collection->update($criteria, $data);
 ```
 
-###Delete documents
+### Delete documents
 
 ``` php
 $collection->remove($criteria);
@@ -105,7 +105,7 @@ Cursor::each($callable)
 Cursor::toArray()
 ```
 
-##Installation
+## Installation
 
 To install and use MongoLite via the composer PHP package manager just take these steps:
 
