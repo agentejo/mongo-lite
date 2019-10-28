@@ -102,7 +102,7 @@ class Collection {
         $res = $this->database->connection->exec($sql);
 
         if ($res){
-            return $this->database->connection->lastInsertId();
+            return $document['_id'];
         } else {
             trigger_error('SQL Error: '.\implode(', ', $this->database->connection->errorInfo()).":\n".$sql);
             return false;
