@@ -90,7 +90,7 @@ class Collection {
         $fields = [];
         $values = [];
 
-        foreach($data as $col=>$value){
+        foreach ($data as $col=>$value){
             $fields[] = "`{$col}`";
             $values[] = (\is_null($value) ? 'NULL' : $this->database->connection->quote($value));
         }
