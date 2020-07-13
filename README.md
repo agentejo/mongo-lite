@@ -58,7 +58,7 @@ $collection->update($criteria, $data);
 $collection->remove($criteria);
 ```
 
-##API
+## API
 
 **Client**
 
